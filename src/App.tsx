@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Tv from "./pages/Tv";
 import Header from "./components/Header";
-import { createGlobalStyle, DefaultTheme } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
 
@@ -39,7 +39,7 @@ const GlobalStyle = createGlobalStyle`
   }
   body {
     line-height: 1;
-    background-color: ${(props) => props.theme.black.darker};
+    background-color: ${(props) => props.theme.white.lighter};
     overflow-y: scroll;
   }
   menu, ol, ul {
