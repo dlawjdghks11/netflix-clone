@@ -1,9 +1,12 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { useNavigate, useMatch } from "react-router-dom";
+import { useState } from "react";
+import SearchIcon from "../assets/icon-search.png";
 
 const Nav = styled.nav`
   width: 100%;
+  height: 65px;
   padding: 20px 60px;
   display: flex;
   position: fixed;
@@ -53,7 +56,32 @@ const Circle = styled(motion.span)`
   margin: 0 auto;
 `;
 
-const Search = styled.input`
+const Search = styled.span`
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+`;
+
+const Input = styled(motion.input)`
+  margin-left: 5px;
+  transform-origin: right center;
+  border: 1px solid white;
+  background-color: ${(props) => props.theme.black.lighter};
+  height: 35px;
+  width: 200px;
+  color: white;
+  padding-left: 35px;
+  border: 1px solid white;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const Icon = styled(motion.img)`
+  width: 20px;
+  height: 20px;
   margin-left: auto;
 `;
 
@@ -71,6 +99,22 @@ const Header = () => {
   const navigate = useNavigate();
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("/tv");
+  const [openSearch, setOpenSearch] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const inputAnimation = useAnimation();
+
+  const handleSearchClick = () => {
+    if (openSearch) {
+      inputAnimation.start({
+        scaleX: 0,
+      });
+    } else {
+      inputAnimation.start({
+        scaleX: 1,
+      });
+    }
+    setOpenSearch((prev) => !prev);
+  };
   return (
     <Nav>
       <Logo
@@ -92,7 +136,28 @@ const Header = () => {
           Tv Shows {tvMatch && <Circle layoutId="circle" />}
         </Item>
       </Items>
-      <Search></Search>
+      {
+        <Search>
+          <Icon
+            layoutId="icon"
+            src={SearchIcon}
+            alt="search"
+            onClick={handleSearchClick}
+            animate={{
+              x: openSearch ? 35 : 200,
+              transition: { type: "tween" },
+            }}
+            transition={{ type: "tween" }}
+          />
+          <Input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            initial={{ scaleX: 0 }}
+            animate={inputAnimation}
+            transition={{ type: "tween" }}
+          />
+        </Search>
+      }
     </Nav>
   );
 };
