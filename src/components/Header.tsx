@@ -1,10 +1,15 @@
 import styled from "styled-components";
-import { motion, useAnimation } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  useScroll,
+  useMotionValueEvent,
+} from "framer-motion";
 import { useNavigate, useMatch } from "react-router-dom";
 import { useState } from "react";
 import SearchIcon from "../assets/icon-search.png";
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
   width: 100%;
   height: 65px;
   padding: 20px 60px;
@@ -95,6 +100,11 @@ const logoVariants = {
   },
 };
 
+const navVariants = {
+  top: { backgroundColor: "rgba(0, 0, 0, 0)" },
+  scroll: { backgroundColor: "rgba(0, 0, 0, 1)" },
+};
+
 const Header = () => {
   const navigate = useNavigate();
   const homeMatch = useMatch("/");
@@ -102,6 +112,8 @@ const Header = () => {
   const [openSearch, setOpenSearch] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputAnimation = useAnimation();
+  const navAnimation = useAnimation();
+  const { scrollY } = useScroll();
 
   const handleSearchClick = () => {
     if (openSearch) {
@@ -115,8 +127,16 @@ const Header = () => {
     }
     setOpenSearch((prev) => !prev);
   };
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 70) {
+      navAnimation.start("scroll");
+    } else {
+      navAnimation.start("top");
+    }
+  });
   return (
-    <Nav>
+    <Nav variants={navVariants} initial="top" animate={navAnimation}>
       <Logo
         variants={logoVariants}
         initial="normal"
@@ -145,7 +165,6 @@ const Header = () => {
             onClick={handleSearchClick}
             animate={{
               x: openSearch ? 35 : 200,
-              transition: { type: "tween" },
             }}
             transition={{ type: "tween" }}
           />

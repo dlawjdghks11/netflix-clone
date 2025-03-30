@@ -41,6 +41,7 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1;
     background-color: ${(props) => props.theme.white.lighter};
     overflow-y: scroll;
+    height: 200vh;
   }
   menu, ol, ul {
     list-style: none;
