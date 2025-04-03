@@ -19,6 +19,7 @@ const Nav = styled(motion.nav)`
   font-size: 14px;
   color: ${(props) => props.theme.white.lighter};
   background-color: ${(props) => props.theme.black.darker};
+  z-index: 1;
 `;
 
 const Logo = styled(motion.svg)`

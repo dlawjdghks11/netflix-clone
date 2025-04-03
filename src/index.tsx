@@ -44,7 +44,8 @@ const GlobalStyle = createGlobalStyle`
   }
   body {
     line-height: 1;
-    background-color: ${(props) => props.theme.white.lighter};
+    background-color: ${(props) => props.theme.black.darker};
+    color: ${(props) => props.theme.white.darker};
     overflow-y: scroll;
     height: 200vh;
   }
