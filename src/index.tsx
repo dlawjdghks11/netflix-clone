@@ -47,6 +47,7 @@ const GlobalStyle = createGlobalStyle`
     background-color: ${(props) => props.theme.black.darker};
     color: ${(props) => props.theme.white.darker};
     overflow-y: scroll;
+    overflow-x: hidden;
     height: 200vh;
   }
   menu, ol, ul {
