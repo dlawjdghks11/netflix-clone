@@ -8,6 +8,7 @@ const Container = styled.div`
   justify-content: center;
   overflow-x: visible;
   position: relative;
+  margin-top: -160px;
 `;
 
 interface RowProps {
@@ -33,20 +34,18 @@ const Card = styled(motion.div)<{ $bgPhoto: string }>`
 `;
 
 const rowVariants = {
-  hidden: { x: window.innerWidth - 10 },
+  hidden: { x: document.documentElement.clientWidth + 80 },
   show: { x: 0 },
-  exit: { x: -window.innerWidth + 10 },
+  exit: { x: -document.documentElement.clientWidth - 80 },
 };
 
 const cardVariants = {
   initial: { scale: 1, transition: { type: "tween" } },
   hover: {
-    scale: 1.3,
+    scale: 1.1,
     transition: {
-      delay: 0.3,
       type: "tween",
     },
-    y: -50,
   },
   exit: {},
 };
@@ -56,11 +55,10 @@ interface List {
   imageUrl: string;
   offset: number;
   page: number;
-  onClickMovie: (id: number) => void;
+  onClickMovie: (id: string) => void;
 }
 
 const Slider = ({ row, imageUrl, offset, page, onClickMovie }: List) => {
-  console.log(offset);
   return (
     <Container>
       <AnimatePresence initial={false}>
@@ -80,7 +78,7 @@ const Slider = ({ row, imageUrl, offset, page, onClickMovie }: List) => {
               initial="initial"
               whileHover="hover"
               exit="exit"
-              onClick={() => onClickMovie(el.id)}
+              onClick={() => onClickMovie(String(el.id))}
               $bgPhoto={`${imageUrl}${el.poster_path}`}
             />
           ))}

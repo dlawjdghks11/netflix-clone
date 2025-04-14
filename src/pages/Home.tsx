@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMovieList } from "../api";
 import { useQuery } from "@tanstack/react-query";
 import { Movies, MoviesDetail } from "../types/api";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import Slider from "../components/Slider";
+import Detail from "../components/Detail";
 
-const IMAGE_URL = "https://image.tmdb.org/t/p/original";
+export const IMAGE_URL = "https://image.tmdb.org/t/p/original";
 
 const Banner = styled(motion.div)<{ $bgPhoto: string }>`
   height: 100vh;
@@ -36,13 +38,21 @@ const Overview = styled.p`
   line-height: 20px;
 `;
 
+const bannerVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 1 } },
+  exit: { opacity: 0, transition: { duration: 1 } },
+};
+
 const Home = () => {
+  const navigate = useNavigate();
   const getViewportWidth = () => document.documentElement.clientWidth;
   const { data, isLoading } = useQuery<Movies>({
     queryKey: ["movies", "nowPlaying"],
     queryFn: getMovieList,
   });
   const [currentMovie, setCurrentMovie] = useState<MoviesDetail | null>(null);
+  const [bannerMovie, setBannerMovie] = useState<MoviesDetail | null>(null);
   const [windowWidth, setWindowWidth] = useState(
     document.documentElement.clientWidth - 300
   );
@@ -51,6 +61,7 @@ const Home = () => {
   >(null);
   const [page, setPage] = useState(0);
   const [leaving, setLeaving] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
   const nowPlayingMoviesLength = data ? data?.results.length : 0;
   const offset = Math.ceil(windowWidth / 150);
 
@@ -70,9 +81,11 @@ const Home = () => {
     }
   };
 
-  const onClickMovie = (id: number) => {
+  const onClickMovie = (id: string) => {
     if (data) {
-      setCurrentMovie(data.results.find((el) => el.id === id)!);
+      setCurrentMovie(data.results.find((el) => String(el.id) === id)!);
+      setOpenDetail((prev) => !prev);
+      navigate(`/movies/${id}`);
     }
   };
 
@@ -88,23 +101,42 @@ const Home = () => {
   useEffect(() => {
     const newOffset = Math.ceil(windowWidth / 150);
     if (data) {
-      setCurrentMovie(data.results[0]);
+      setBannerMovie(data.results[0]);
       setNowPlayingSlider(data.results.slice(0, newOffset));
     }
   }, [data, windowWidth]);
 
+  useEffect(() => {
+    if (!data) return;
+
+    let index = 0;
+    const total = data.results.length;
+
+    const intervalId = setInterval(() => {
+      index = (index + 1) % total; // 마지막 인덱스까지 갔다가 다시 처음으로
+      setBannerMovie(data.results[index]);
+    }, 7000); // 7초마다 실행
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 인터벌 정리
+  }, [data]);
+
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       {isLoading ? (
         "Loading..."
       ) : (
         <>
           <Banner
-            $bgPhoto={`${IMAGE_URL}${currentMovie?.backdrop_path}`}
+            $bgPhoto={`${IMAGE_URL}${bannerMovie?.backdrop_path}`}
+            key={bannerMovie?.id}
             onClick={nextSlider}
+            variants={bannerVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
           >
-            <Title>{currentMovie?.title}</Title>
-            <Overview>{currentMovie?.overview}</Overview>
+            <Title>{bannerMovie?.title}</Title>
+            <Overview>{bannerMovie?.overview}</Overview>
           </Banner>
           <Slider
             row={nowPlayingSlider}
@@ -115,6 +147,14 @@ const Home = () => {
           />
         </>
       )}
+      {openDetail ? (
+        <Detail
+          openModal={() =>
+            onClickMovie(currentMovie ? String(currentMovie?.id) : "")
+          }
+          data={data}
+        />
+      ) : null}
     </div>
   );
 };
